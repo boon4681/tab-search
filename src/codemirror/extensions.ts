@@ -58,7 +58,6 @@ class LanguageAutocomplete {
             }
             let table = context.matchBefore(/@[\w_]*/);
             if (table) {
-                console.log(this.tables)
                 return {
                     from: table.from + 1,
                     options: this.tables
@@ -82,14 +81,13 @@ class LanguageAutocomplete {
             if (word.text.includes('.')) {
                 return this.handlePropertyAccess(word.text, word.from);
             }
-            const tables = this.tables.filter(c => c.label.toLowerCase().startsWith(word.text.toLowerCase()))
             const options = [
                 ...this.operators,
                 ...this.literals,
             ].filter(c => c.label.toLowerCase().startsWith(word.text.toLowerCase()))
             return {
                 from: word.from,
-                options: [...tables, ...options]
+                options: [...options]
             };
         };
     }
@@ -126,7 +124,6 @@ class LanguageAutocomplete {
             })
             .filter(a => a != undefined)
             .filter(c => c.label.startsWith(currentFragment))
-        console.log(final)
         return {
             from: from + text.length - currentFragment.length,
             options: final
@@ -192,7 +189,7 @@ export function tabSearchHighlighter() {
                 // operators
                 {
                     regex: /\&\&|\|\||\=|\!\=|\~|\!\~|\>|\<|\>\=|\<\=|startwiths|endwiths/,
-                    token: "operator",
+                    token: "typeOperator",
                 },
                 // indent and dedent properties guide autoindentation
                 { regex: /[\{\[\(]/, indent: true },

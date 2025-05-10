@@ -20,37 +20,39 @@ export function getTables<TSchema extends Record<string, unknown>>(schema: TSche
     return tables as Record<string, Table>
 }
 
-export function Tab<const TSchema extends Record<string, unknown> = Record<string, never>>(schema: TSchema, options?: { extensions?: Extension[] }) {
+export function Tab<const TSchema extends Record<string, unknown> = Record<string, never>>(schema: TSchema) {
     const tables = getTables(schema)
-    const functions: Record<string, AstFunctionResolver> = {}
-    if (options?.extensions) {
-        for (const extension of options.extensions) {
-            functions[extension.name] = extension.resolve
-        }
-    }
     return {
-        use: <J extends (keyof TSchema) & string>(table: J) => ({
-            codemirrorSchema: function () {
-                const preprocess: TProperties = {
-                    [table.toLowerCase()]: tableToTypeBox(tables[table]!)
+        use: <J extends (keyof TSchema) & string>(table: J, options?: { extensions?: Extension[] }) => {
+            const functions: Record<string, AstFunctionResolver> = {}
+            if (options?.extensions) {
+                for (const extension of options.extensions) {
+                    functions[extension.name] = extension.resolve
                 }
-                // for (const table in tables) {
-                //     preprocess[table.toLowerCase()] = tableToTypeBox(tables[table]!)
-                // }
-                return Type.Object({
-                    tables: Type.Object(
-                        preprocess
-                    )
-                })
-            },
-            prepare: function (query: string) {
-                const [ast, error] = parseAST(query, functions)
-                if (error) {
-                    throw new Error(error)
-                }
-                if (ast) return transform(tables[table]!, ast)
-                return undefined
             }
-        })
+            return {
+                codemirrorSchema: function () {
+                    const preprocess: TProperties = {
+                        [table.toLowerCase()]: tableToTypeBox(tables[table]!)
+                    }
+                    // for (const table in tables) {
+                    //     preprocess[table.toLowerCase()] = tableToTypeBox(tables[table]!)
+                    // }
+                    return Type.Object({
+                        tables: Type.Object(
+                            preprocess
+                        )
+                    })
+                },
+                prepare: function (query: string) {
+                    const [ast, error] = parseAST(query, functions)
+                    if (error) {
+                        throw new Error(error)
+                    }
+                    if (ast) return transform(tables[table]!, ast)
+                    return undefined
+                }
+            }
+        }
     }
 }

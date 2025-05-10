@@ -4,7 +4,7 @@
 
 <p>Adapter for frontend and backend to create database search filter</p>
 
-<img src="./refs/tab-search.png" />
+<img src="./refs/banner.png" />
 
 </div>
 
