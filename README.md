@@ -6,8 +6,9 @@
 
 <img src="./refs/tab-search.png" />
 
-<br>
 </div>
+
+<br />
 
     ⚠️ This project is started by boon4681 just for fun.
 
