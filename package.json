@@ -4,6 +4,16 @@
   "main": "index.js",
   "license": "MIT",
   "type": "module",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "author": "boon4681 <46645814+boon4681@users.noreply.github.com>",
+  "homepage": "https://www.boon4681.com/",
+  "repository": "https://github.com/boon4681/tab-search.git",
   "scripts": {
     "dev": "tsup ./{src,tests}/**/*.ts --watch ./{src,tests}/**/*.ts --format cjs,esm --outDir ./dev --onSuccess \"node dev/tests/index.js\"",
     "build:ohm": "npx ohm generateBundles --withTypes src/ohm/tab-search.ohm",
