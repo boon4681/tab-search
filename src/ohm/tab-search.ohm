@@ -1,0 +1,74 @@
+Query {
+    Query = spaces DisjunctionQuery -- spacesLead
+    | spaces -- empty
+    | DisjunctionQuery
+
+    DisjunctionQuery = ConjunctionQuery spaces "or" spaces ConjunctionQuery -- or
+    | ConjunctionQuery
+
+    ConjunctionQuery = PriQuery spaces "and" spaces PriQuery -- and
+    | PriQuery
+    
+    PriQuery = "(" spaces DisjunctionQuery spaces ")" -- paren
+    | QueryComparison
+
+    QueryComparison = Table spaces Operation spaces Exp
+
+    Operation = "==" | ">=" | "<=" | ">" | "<" | "!=" | "endwiths" | "startwiths"
+
+    Exp = OrExp
+    | "+" spaces PriExp   -- pos
+    | "-" spaces PriExp   -- neg
+
+    OrExp = AndExp spaces "|" spaces AndExp -- or
+    | AndExp
+
+    AndExp = AddExp spaces "&" spaces AddExp -- and
+    | AddExp
+
+    AddExp
+    = AddExp spaces "+" spaces MulExp  -- plus
+    | AddExp spaces "-" spaces MulExp  -- minus
+    | MulExp
+
+    MulExp
+    = MulExp spaces "*" spaces PriExp  -- times
+    | MulExp spaces "/" spaces PriExp  -- divide
+    | PriExp
+
+    PriExp
+    = "(" spaces Exp spaces ")"  -- paren
+    | Literal
+
+    Function = ident "(" spaces ")" | ident "(" FunctionParams ")"
+    FunctionParams = spaces Literal (spaces "," spaces Literal)* spaces
+
+    Table = TableName ("." ident)+
+    TableName = "@" ident
+
+    string = doubleQuoteString | singleQuoteString
+    doubleQuoteString = "\"" doubleQuoteContent "\""
+    doubleQuoteContent = (doubleQuoteEscapedChar | doubleQuoteNormalChar)*
+    doubleQuoteEscapedChar = "\\" any
+    doubleQuoteNormalChar = ~("\"" | "\\") any
+
+    singleQuoteString = "'" singleQuoteContent "'"
+    singleQuoteContent = (singleQuoteEscapedChar | singleQuoteNormalChar)*
+    singleQuoteEscapedChar = "\\" any
+    singleQuoteNormalChar = ~("\'" | "\\") any
+
+    Literal = string 
+    | number 
+    | null
+    | Function
+    | Exp 
+
+    null = "null"
+
+    ident  (an identifier)
+    = letter alnum*
+
+    number  (a number)
+    = digit* "." digit+  -- fract
+    | digit+             -- whole
+}

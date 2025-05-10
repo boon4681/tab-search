@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test codemirror</title>
+</head>
+
+<body>
+  <tab-search id="test" src="/cm" placeholder="Testing"></tab-search>
+  <script>
+    const ele = document.getElementById("test")
+    ele.onchange = (e) => {
+      console.log(e.detail)
+    }
+  </script>
+  <script type="module" src="/src/codemirror/index.ts"></script>
+  <link rel="stylesheet" href="/src/codemirror/css/styles.css">
+</body>
+
+</html>

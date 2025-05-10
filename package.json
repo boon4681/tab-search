@@ -1,0 +1,90 @@
+{
+  "name": "tab-search",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "tsup ./{src,tests}/**/*.ts --watch ./{src,tests}/**/*.ts --format cjs,esm --outDir ./dev --onSuccess \"node dev/tests/index.js\"",
+    "build:ohm": "npx ohm generateBundles --withTypes src/ohm/tab-search.ohm",
+    "dev:web": "vite",
+    "build": "tsx ./build.ts"
+  },
+  "peerDependencies": {
+    "@sinclair/typebox": ">=0.34.33",
+    "drizzle-orm": "^0.43.1"
+  },
+  "peerDependenciesMeta": {
+    "drizzle-orm": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@ohm-js/cli": "^2.0.0",
+    "@preact/preset-vite": "^2.10.1",
+    "@types/node": "^22.15.16",
+    "@types/preact-custom-element": "^4.0.4",
+    "drizzle-orm": "^0.43.1",
+    "esbuild-plugin-alias": "^0.2.1",
+    "json-schema-typed": "^8.0.1",
+    "thememirror": "^2.0.1",
+    "tsup": "^8.4.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  },
+  "dependencies": {
+    "@codemirror/autocomplete": "^6.18.6",
+    "@codemirror/language": "^6.11.0",
+    "@codemirror/legacy-modes": "^6.5.1",
+    "@codemirror/search": "^6.5.10",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.36.7",
+    "@sinclair/typebox": "^0.34.33",
+    "@uiw/codemirror-themes": "^4.23.12",
+    "codemirror": "^6.0.1",
+    "ohm-js": "^17.1.0",
+    "preact": "^10.26.6",
+    "preact-custom-element": "^4.3.0"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./drizzle": {
+      "import": {
+        "types": "./dist/drizzle/index.d.ts",
+        "default": "./dist/drizzle/index.mjs"
+      },
+      "require": {
+        "types": "./dist/drizzle/index.d.cts",
+        "default": "./dist/drizzle/index.js"
+      }
+    },
+    "./codemirror": {
+      "import": {
+        "types": "./dist/codemirror/index.d.ts",
+        "default": "./dist/codemirror/index.mjs"
+      },
+      "require": {
+        "types": "./dist/codemirror/index.d.cts",
+        "default": "./dist/codemirror/index.js"
+      }
+    },
+    "./codemirror/css": {
+      "import": {
+        "default": "./dist/codemirror/css/styles.css"
+      },
+      "require": {
+        "default": "./dist/codemirror/css/styles.css"
+      }
+    }
+  }
+}
