@@ -31,7 +31,7 @@ export function Tab<const TSchema extends Record<string, unknown> = Record<strin
                 }
             }
             return {
-                codemirrorSchema: function () {
+                codemirrorSchema() {
                     const preprocess: TProperties = {
                         [table.toLowerCase()]: tableToTypeBox(tables[table]!)
                     }
@@ -44,7 +44,7 @@ export function Tab<const TSchema extends Record<string, unknown> = Record<strin
                         )
                     })
                 },
-                prepare: function (query: string) {
+                async prepare(query: string) {
                     const [ast, error] = parseAST(query, functions)
                     if (error) {
                         throw new Error(error)

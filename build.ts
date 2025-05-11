@@ -8,7 +8,9 @@ const main = async () => {
 		outDir: './dist',
 		external: [
 			'dizzle-orm',
-			'ohm-js'
+			'ohm-js',
+			'@sinclair/typebox',
+			'json-schema-typed'
 		],
 		watch: ['./src/**/*.{ts,tsx,js,css}'],
 		splitting: true,

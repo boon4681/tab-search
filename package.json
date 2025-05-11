@@ -22,7 +22,8 @@
   },
   "peerDependencies": {
     "@sinclair/typebox": ">=0.34.33",
-    "drizzle-orm": "^0.43.1"
+    "drizzle-orm": ">=0.40.0",
+    "json-schema-typed": ">=8.0.1"
   },
   "peerDependenciesMeta": {
     "drizzle-orm": {
@@ -30,14 +31,14 @@
     }
   },
   "devDependencies": {
+    "@sinclair/typebox": "^0.34.33",
     "@ohm-js/cli": "^2.0.0",
     "@preact/preset-vite": "^2.10.1",
     "@types/node": "^22.15.16",
     "@types/preact-custom-element": "^4.0.4",
-    "drizzle-orm": "^0.43.1",
+    "drizzle-orm": "^0.40.0",
     "esbuild-plugin-alias": "^0.2.1",
     "json-schema-typed": "^8.0.1",
-    "thememirror": "^2.0.1",
     "tsup": "^8.4.0",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3",
@@ -50,7 +51,6 @@
     "@codemirror/search": "^6.5.10",
     "@codemirror/state": "^6.5.2",
     "@codemirror/view": "^6.36.7",
-    "@sinclair/typebox": "^0.34.33",
     "@uiw/codemirror-themes": "^4.23.12",
     "codemirror": "^6.0.1",
     "ohm-js": "^17.1.0",
@@ -86,6 +86,26 @@
       "require": {
         "types": "./dist/codemirror/index.d.cts",
         "default": "./dist/codemirror/index.js"
+      }
+    },
+    "./codemirror/extensions": {
+      "import": {
+        "types": "./dist/codemirror/extensions.d.ts",
+        "default": "./dist/codemirror/extensions.mjs"
+      },
+      "require": {
+        "types": "./dist/codemirror/extensions.d.cts",
+        "default": "./dist/codemirror/extensions.js"
+      }
+    },
+    "./codemirror/starter-kit": {
+      "import": {
+        "types": "./dist/codemirror/starter-kit.d.ts",
+        "default": "./dist/codemirror/starter-kit.mjs"
+      },
+      "require": {
+        "types": "./dist/codemirror/starter-kit.d.cts",
+        "default": "./dist/codemirror/starter-kit.js"
       }
     },
     "./codemirror/css": {

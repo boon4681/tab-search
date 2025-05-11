@@ -5,6 +5,7 @@ import { EditorView, basicSetup } from "codemirror";
 import { EditorState, Compartment } from "@codemirror/state";
 import StarterKit from "./starter-kit";
 import { type JSONSchema } from "json-schema-typed/draft-07";
+import { keymap } from "@codemirror/view";
 
 export interface TabSearchProps {
     placeholder?: string
@@ -15,6 +16,7 @@ export interface TabSearchProps {
 function TabSearch({ placeholder, src, theme }: TabSearchProps) {
     if (!src) throw new Error("TabSearch Missing src attribute")
     const ref = createRef<HTMLDivElement>()
+    const shadowDoc = createRef<string>()
     const [editor, setEditor] = useState<EditorView>()
     const [ready, setReady] = useState<boolean>(false)
     const [schema, setSchema] = useState<JSONSchema>({})
@@ -30,18 +32,28 @@ function TabSearch({ placeholder, src, theme }: TabSearchProps) {
         if (!ready || editor) return;
         const self = ref.current!
         const docChangeExtension = EditorView.updateListener.of((v) => {
+            const doc = v.state.doc.toString()
+            shadowDoc.current = doc + ""
             self.dispatchEvent(new CustomEvent("change", {
-                detail: {
-                    doc: v.state.doc.toString()
-                },
-                composed: true,
-                bubbles: true
+                detail: { doc }, composed: true, bubbles: true
             }))
         });
         let cm = new EditorView({
             extensions: [
+                docChangeExtension,
+                keymap.of([
+                    {
+                        key: "Enter",
+                        run: () => {
+                            // trigger submit on enter for singleline input
+                            self.dispatchEvent(new CustomEvent("submit", {
+                                detail: { doc: shadowDoc.current }, composed: true, bubbles: true
+                            }))
+                            return true
+                        },
+                    },
+                ]),
                 ...StarterKit({ placeholder, schema, theme }),
-                docChangeExtension
             ],
             parent: ref.current!,
         })

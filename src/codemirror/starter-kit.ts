@@ -15,7 +15,7 @@ import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
 import { autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { EditorState, Compartment } from "@codemirror/state";
 import { tabSearchAutocomplete, tabSearchHighlighter, tabSearchLockInline } from "./extensions";
-import { githubLight, githubDark } from './theme';
+import { LightTheme, DarkTheme } from './theme';
 import { type JSONSchema } from "json-schema-typed/draft-07";
 
 export default function StarterKit(options: {
@@ -28,9 +28,9 @@ export default function StarterKit(options: {
     const themeCompartment = new Compartment();
     const themes = (theme: "dark" | "light" | string) => {
         if (theme == "dark") {
-            return githubDark;
+            return DarkTheme;
         } else {
-            return githubLight;
+            return LightTheme;
         }
     };
     const extensions = [
