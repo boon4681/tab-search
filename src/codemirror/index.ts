@@ -1,1 +1,4 @@
-import "./editor"
+
+if (typeof window !== 'undefined') {
+    import("./editor")
+}

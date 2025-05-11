@@ -8,6 +8,7 @@ import {
     highlightSpecialChars,
     dropCursor,
     highlightActiveLineGutter,
+    drawSelection,
 } from "@codemirror/view";
 import { indentUnit, foldGutter, bracketMatching } from "@codemirror/language";
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
@@ -36,12 +37,13 @@ export default function StarterKit(options: {
         EditorView.lineWrapping,
         highlightActiveLineGutter(),
         highlightSpecialChars(),
+        history(),
+        drawSelection(),
+        dropCursor(),
         bracketMatching(),
         closeBrackets(),
-        dropCursor(),
         rectangularSelection(),
         highlightSelectionMatches(),
-        history(),
         EditorView.theme({
             "&": {
                 overflow: "hidden",

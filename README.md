@@ -12,15 +12,24 @@
 
     ⚠️ This project is started by boon4681 just for fun.
 
+## Preview
+
+<img src="./refs/preview.gif" />
+
 ## Usage
 
 ### Svelte, Hono, Drizzle ORM
 ```svelte
 <!-- page.svelte -->
 <script lang="ts">
-    import "tab-search/codemirror";
-    import "tab-search/codemirror/css";
     import { mode } from "mode-watcher";
+    import { onMount } from "svelte";
+    import "tab-search/codemirror/css";
+
+    onMount(async () => {
+        // made it load on client-side
+        await import("tab-search/codemirror");
+    });
 </script>
 
 <tab-search
