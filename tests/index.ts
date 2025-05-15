@@ -3,7 +3,7 @@ import { Tab } from "../src/drizzle";
 import * as schema from "./drizzle/schema"
 import { createFunctionExtension } from "../src/extension";
 
-const d = Tab(schema).use("USER", {
+const d = Tab(schema).use("USER", schema.USER, {
     extensions: [
         createFunctionExtension("test", (ast) => {
             return 0
