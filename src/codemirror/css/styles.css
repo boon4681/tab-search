@@ -1,4 +1,5 @@
 .tab-search {
+    min-height: 28px;
     .cm-editor {
         margin: 0.25em;
         outline: none;
