@@ -46,7 +46,7 @@ function TabSearch({ placeholder, src, theme }: TabSearchProps) {
                         key: "Enter",
                         run: () => {
                             // trigger submit on enter for singleline input
-                            self.dispatchEvent(new CustomEvent("submit", {
+                            self.dispatchEvent(new CustomEvent("input", {
                                 detail: { doc: shadowDoc.current }, composed: true, bubbles: true
                             }))
                             return true

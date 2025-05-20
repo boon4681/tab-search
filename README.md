@@ -51,13 +51,17 @@ import db from '$database'
 const app = new Hono()
 const tab = Tab(schema)
 
+
+// create user tab
+const tab$user = tab.use("USER", schema.USER)
+
 app.get('/tab', async (c) => {
-    return c.json(crawler.use("USER").codemirrorSchema())
+    return c.json(tab$user.codemirrorSchema())
 })
 
 app.post('/tab',async (c)=> {
     const query = await c.req.text()
-    const where = tab.use("USER").prepare(query)
+    const where = tab$user.prepare(query)
     const data = await db.query.USER.findMany({
         where
     })
