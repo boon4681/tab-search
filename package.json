@@ -1,6 +1,6 @@
 {
   "name": "tab-search",
-  "version": "0.1.0b",
+  "version": "0.1.0c",
   "main": "index.js",
   "license": "MIT",
   "type": "module",
