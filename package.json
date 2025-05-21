@@ -18,7 +18,7 @@
     "dev": "tsup ./{src,tests}/**/*.ts --watch ./{src,tests}/**/*.ts --format cjs,esm --outDir ./dev --onSuccess \"node dev/tests/index.js\"",
     "build:ohm": "npx ohm generateBundles --withTypes src/ohm/tab-search.ohm",
     "dev:web": "vite",
-    "build": "tsx ./build.ts"
+    "build": "tsx watch ./build.ts"
   },
   "peerDependencies": {
     "@sinclair/typebox": ">=0.34.33",

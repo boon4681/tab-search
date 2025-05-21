@@ -16,6 +16,7 @@ const main = async () => {
 		splitting: true,
 		dts: true,
 		clean: true,
+		treeshake: true,
 		format: ['cjs', 'esm'],
 		outExtension: (ctx) => {
 			if (ctx.format === 'cjs') {
