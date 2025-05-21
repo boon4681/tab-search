@@ -31,9 +31,9 @@
     }
   },
   "devDependencies": {
-    "@sinclair/typebox": "^0.34.33",
     "@ohm-js/cli": "^2.0.0",
     "@preact/preset-vite": "^2.10.1",
+    "@sinclair/typebox": "^0.34.33",
     "@types/node": "^22.15.16",
     "@types/preact-custom-element": "^4.0.4",
     "drizzle-orm": "^0.40.0",
@@ -51,7 +51,6 @@
     "@codemirror/search": "^6.5.10",
     "@codemirror/state": "^6.5.2",
     "@codemirror/view": "^6.36.7",
-    "@uiw/codemirror-themes": "^4.23.12",
     "codemirror": "^6.0.1",
     "ohm-js": "^17.1.0",
     "preact": "^10.26.6",

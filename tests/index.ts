@@ -15,7 +15,7 @@ const testcases = [
     String.raw`   `,
     String.raw` @user.id == 10`,
     String.raw`@user.id >= 10 and @user.username startwiths 'CSPD'`,
-    String.raw`@user.id >= test(10)`,
+    String.raw`@user.updated_at >= "2025-05-21"`,
 ]
 for (const test of testcases) {
     try {

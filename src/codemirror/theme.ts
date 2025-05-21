@@ -1,8 +1,8 @@
 import { tags as t } from '@lezer/highlight';
-import { createTheme, type CreateThemeOptions } from '@uiw/codemirror-themes';
+import createTheme, { CreateThemeOptions } from "./patch-theme"
 
 export const defaultSettingsLight: CreateThemeOptions['settings'] = {
-	background: '#fff',
+	background: '#ffffff00',
 	foreground: '#24292e',
 	selection: '#BBDFFF',
 	selectionMatch: '#BBDFFF',

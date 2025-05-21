@@ -29,6 +29,10 @@ function TabSearch({ placeholder, src, theme }: TabSearchProps) {
     }, [])
 
     useEffect(() => {
+        console.log(theme,"HI")
+    }, [theme])
+
+    useEffect(() => {
         if (!ready || editor) return;
         const self = ref.current!
         const docChangeExtension = EditorView.updateListener.of((v) => {
@@ -46,7 +50,7 @@ function TabSearch({ placeholder, src, theme }: TabSearchProps) {
                         key: "Enter",
                         run: () => {
                             // trigger submit on enter for singleline input
-                            self.dispatchEvent(new CustomEvent("input", {
+                            self.dispatchEvent(new CustomEvent("submit", {
                                 detail: { doc: shadowDoc.current }, composed: true, bubbles: true
                             }))
                             return true

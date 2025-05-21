@@ -1,6 +1,12 @@
+import { LineAndColumnInfo } from "ohm-js"
+
 export type AstQuery = AstQueryOr | AstQueryAnd | AstQueryComparison
 
-export type Literal = string | number | boolean | null
+// export type Literal = string | number | boolean | null
+export interface Literal {
+    position: LineAndColumnInfo
+    data: string | number | boolean | null
+}
 
 export interface AstTable {
     type: 'table',

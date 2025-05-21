@@ -54,6 +54,14 @@ export interface QueryActionDict<T> extends BaseActionDict<T> {
   Literal?: (this: NonterminalNode, arg0: NonterminalNode) => T;
   null?: (this: NonterminalNode, arg0: TerminalNode) => T;
   ident?: (this: NonterminalNode, arg0: NonterminalNode, arg1: IterationNode) => T;
+  identifierStart?: (this: NonterminalNode, arg0: NonterminalNode | TerminalNode) => T;
+  identifierPart?: (this: NonterminalNode, arg0: NonterminalNode | TerminalNode) => T;
+  letter?: (this: NonterminalNode, arg0: NonterminalNode) => T;
+  unicodeCategoryNl?: (this: NonterminalNode, arg0: TerminalNode) => T;
+  unicodeDigit?: (this: NonterminalNode, arg0: TerminalNode) => T;
+  unicodeCombiningMark?: (this: NonterminalNode, arg0: TerminalNode) => T;
+  unicodeConnectorPunctuation?: (this: NonterminalNode, arg0: TerminalNode) => T;
+  unicodeSpaceSeparator?: (this: NonterminalNode, arg0: TerminalNode) => T;
   number_fract?: (this: NonterminalNode, arg0: IterationNode, arg1: TerminalNode, arg2: IterationNode) => T;
   number_whole?: (this: NonterminalNode, arg0: IterationNode) => T;
   number?: (this: NonterminalNode, arg0: NonterminalNode) => T;

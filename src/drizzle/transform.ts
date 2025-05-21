@@ -1,28 +1,41 @@
 import { and, eq, getTableColumns, getTableName, ne, gte, lte, lt, or, SQL, SQLWrapper, Table, gt, Column, like, isNull, isNotNull } from "drizzle-orm";
 import { AstQuery, AstQueryAnd, AstQueryComparison, AstQueryOr, Literal } from "../ast.internal.types";
+import { AssertError, Value } from "@sinclair/typebox/value";
+import { resolveSafeParse, StringToDate } from "../typebox";
 
-function castValue(tableName: string, column: Column, value: Literal) {
+function castLiteral(tableName: string, column: Column, literal: Literal) {
     const dataType = column.dataType
-    function error() {
+    const value = literal.data
+    function mismatch() {
         return new Error(`Type mismatched at ${tableName}.${column.name}, cannot compare ${JSON.stringify(dataType)} to ${JSON.stringify(typeof value)}.`)
+    }
+    function parsefail(err: AssertError) {
+        return new Error(`Failed to parse ${dataType} at Line:${literal.position.lineNum}:${literal.position.colNum}, ${err.message}`)
     }
     if (typeof value == "number") {
         if (dataType == "number") {
             return value
         }
-        throw error()
+        throw mismatch()
     }
     if (typeof value == "bigint" || typeof value == "number") {
         if (dataType == "bigint") {
             return value
         }
-        throw error()
+        throw mismatch()
     }
     if (typeof value == "string") {
         if (dataType == "string") {
             return value
         }
-        throw error()
+        if (dataType == "date") {
+            const [v, err] = resolveSafeParse(() => Value.Parse(StringToDate, value))
+            if (err) {
+                throw parsefail(err)
+            }
+            return v
+        }
+        throw mismatch()
     }
     if (dataType == "json") {
         throw new Error(`JSON comparison is not supported. ${tableName}.${column.name}`)
@@ -51,11 +64,11 @@ function transformQueryComparison(table: Table, ast: AstQueryComparison) {
     if (!(ast.table.column in columns)) {
         throw new Error("Unknown column named " + JSON.stringify(ast.table.column) + " in table " + JSON.stringify(tableName) + ".")
     }
-    if (ast.value == null && columns[ast.table.column]!.notNull) {
+    if (ast.value.data == null && columns[ast.table.column]!.notNull) {
         throw new Error(`${ast.table.name}.${ast.table.column} compare to null`)
     }
     const column = columns[ast.table.column]!
-    const cast = castValue(tableName, column, ast.value)
+    const cast = castLiteral(tableName, column, ast.value)
     switch (ast.comparator) {
         case "==":
             if (cast == null) return isNull(column)
@@ -87,5 +100,5 @@ export function transform(table: Table<any>, ast: AstQuery): SQL {
         case "query_comparison":
             return transformQueryComparison(table, ast)
     }
-    throw new Error("This should Unreachable.")
+    throw new Error("Unreachable code.")
 }
