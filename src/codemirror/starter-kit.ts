@@ -70,5 +70,10 @@ export default function StarterKit(options: {
         extensions.push(placeholderCompartment.of(placeholderExt(options.placeholder)))
     }
     extensions.push(themeCompartment.of(themes(options.theme ?? "light")))
-    return extensions
+    function changeTheme(editor: EditorView, theme: "dark" | "light") {
+        editor.dispatch({
+            effects: themeCompartment.reconfigure(themes(theme))
+        })
+    }
+    return { extensions, changeTheme }
 }

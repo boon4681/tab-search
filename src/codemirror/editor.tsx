@@ -20,6 +20,7 @@ function TabSearch({ placeholder, src, theme }: TabSearchProps) {
     const [editor, setEditor] = useState<EditorView>()
     const [ready, setReady] = useState<boolean>(false)
     const [schema, setSchema] = useState<JSONSchema>({})
+    const starterKit = StarterKit({ placeholder, schema, theme })
 
     useEffect(() => {
         fetch(src).then(res => res.json()).then(json => {
@@ -29,8 +30,9 @@ function TabSearch({ placeholder, src, theme }: TabSearchProps) {
     }, [])
 
     useEffect(() => {
-        console.log(theme,"HI")
-    }, [theme])
+        if (!ready || !editor) return;
+        starterKit.changeTheme(editor, theme as any)
+    }, [theme, ready, editor])
 
     useEffect(() => {
         if (!ready || editor) return;
@@ -57,7 +59,7 @@ function TabSearch({ placeholder, src, theme }: TabSearchProps) {
                         },
                     },
                 ]),
-                ...StarterKit({ placeholder, schema, theme }),
+                starterKit.extensions,
             ],
             parent: ref.current!,
         })
