@@ -17,11 +17,12 @@ import { EditorState, Compartment } from "@codemirror/state";
 import { tabSearchAutocomplete, tabSearchHighlighter, tabSearchLockInline } from "./extensions";
 import { LightTheme, DarkTheme } from './theme';
 import { type JSONSchema } from "json-schema-typed/draft-07";
+import { EDITOR_INTERFACE_V1 } from "../interface";
 
 export default function StarterKit(options: {
     placeholder?: string,
     theme?: "light" | "dark" | string,
-    schema: JSONSchema
+    schema: EDITOR_INTERFACE_V1
 } = { theme: "light", schema: {} }) {
     const languageCompartment = new Compartment();
     const placeholderCompartment = new Compartment();
@@ -69,11 +70,11 @@ export default function StarterKit(options: {
     if (options.placeholder) {
         extensions.push(placeholderCompartment.of(placeholderExt(options.placeholder)))
     }
-    extensions.push(themeCompartment.of(themes(options.theme ?? "light")))
     function changeTheme(editor: EditorView, theme: "dark" | "light") {
         editor.dispatch({
             effects: themeCompartment.reconfigure(themes(theme))
         })
     }
+    extensions.push(themeCompartment.of(themes(options.theme ?? "light")))
     return { extensions, changeTheme }
 }

@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [preact()],
   server:{
     proxy:{
-      '/cm': 'http://localhost:4090',
+      '/tab': 'http://localhost:4090',
     }
   }
 })

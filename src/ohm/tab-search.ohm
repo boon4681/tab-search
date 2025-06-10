@@ -14,7 +14,7 @@ Query {
 
     QueryComparison = Table spaces Operation spaces Exp
 
-    Operation = "==" | ">=" | "<=" | ">" | "<" | "!=" | "endwiths" | "startwiths"
+    Operation = "==" | ">=" | "<=" | ">" | "<" | "!=" | "endwiths" | "startwiths" | "contains"
 
     Exp = OrExp
     | "+" spaces PriExp   -- pos

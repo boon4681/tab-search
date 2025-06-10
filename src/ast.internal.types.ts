@@ -22,7 +22,7 @@ export interface AstQueryComparison {
     value: Literal
 }
 
-export type Comparator = "==" | "!=" | "<=" | ">=" | ">" | "<" | "startwiths" | "endwiths"
+export type Comparator = "==" | "!=" | "<=" | ">=" | ">" | "<" | "startwiths" | "endwiths" | "contains"
 
 export interface AstQueryOr {
     type: 'query_or',

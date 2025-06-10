@@ -6,6 +6,7 @@ import { EditorState, Compartment } from "@codemirror/state";
 import StarterKit from "./starter-kit";
 import { type JSONSchema } from "json-schema-typed/draft-07";
 import { keymap } from "@codemirror/view";
+import { EDITOR_INTERFACE_V1 } from "../interface";
 
 export interface TabSearchProps {
     placeholder?: string
@@ -19,9 +20,9 @@ function TabSearch({ placeholder, src, theme }: TabSearchProps) {
     const shadowDoc = createRef<string>()
     const [editor, setEditor] = useState<EditorView>()
     const [ready, setReady] = useState<boolean>(false)
-    const [schema, setSchema] = useState<JSONSchema>({})
+    const [schema, setSchema] = useState<EDITOR_INTERFACE_V1>({})
     const starterKit = StarterKit({ placeholder, schema, theme })
-
+    // console.log()
     useEffect(() => {
         fetch(src).then(res => res.json()).then(json => {
             setSchema(json)

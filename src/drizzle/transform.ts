@@ -88,6 +88,8 @@ function transformQueryComparison(table: Table, ast: AstQueryComparison) {
             return like(column, cast + "%")
         case "endwiths":
             return like(column, "%" + cast)
+        case "contains":
+            return like(column, "%" + cast + "%")
     }
 }
 

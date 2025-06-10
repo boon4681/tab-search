@@ -1,11 +1,12 @@
 import { TSchema, Type } from "@sinclair/typebox";
 import { Column, getTableColumns, Table } from "drizzle-orm";
+import { EDITOR_INTERFACE_V1, EDITOR_INTERFACE_V1_TABLE_SET } from "./interface";
 
-function Nullable<T extends TSchema>(T: T) {
+export function Nullable<T extends TSchema>(T: T) {
     return Type.Union([T, Type.Null()])
 }
 
-function dataTypeToStatic(dataType: Column['dataType']) {
+function dataTypeToTypeBoxStatic(dataType: Column['dataType']) {
     switch (dataType) {
         case "string":
             return Type.String()
@@ -39,7 +40,7 @@ function dataTypeToStatic(dataType: Column['dataType']) {
 function columnToTypeBox(column: Column) {
     const dataType = column.dataType
     const notNull = column.notNull
-    const type = dataTypeToStatic(dataType)
+    const type = dataTypeToTypeBoxStatic(dataType)
     if (notNull && type && !column.hasDefault) {
         return Nullable(type)
     }
@@ -54,4 +55,25 @@ export function tableToTypeBox(table: Table) {
         if (type) obj[key] = type
     }
     return Type.Object(obj)
+}
+
+function dataTypeToTypeSchemaV1(dataType: Column['dataType']) {
+    return dataType as string
+}
+
+export function columnToSchemaV1(column: Column) {
+    const dataType = column.dataType
+    return {
+        type: dataTypeToTypeSchemaV1(dataType)
+    }
+}
+
+export function tableToSchemaV1(table: Table) {
+    const obj: EDITOR_INTERFACE_V1_TABLE_SET[string] = {}
+    const columns = getTableColumns(table)
+    for (const [key, value] of Object.entries(columns)) {
+        const schema = columnToSchemaV1(value)
+        if (schema) obj[key] = schema
+    }
+    return obj
 }

@@ -9,21 +9,19 @@ import { EditorState, Compartment } from "@codemirror/state";
 import { simpleMode } from "@codemirror/legacy-modes/mode/simple-mode";
 import { autocompletion, CompletionContext, type CompletionResult } from "@codemirror/autocomplete";
 import { TSchema } from "@sinclair/typebox";
-import { type JSONSchema } from "json-schema-typed/draft-07";
+import { EDITOR_INTERFACE_V1, EDITOR_INTERFACE_V1_TABLE } from "../interface";
 
-function unwrapJSON(def: JSONSchema | undefined) {
-    if (typeof def == "boolean") return undefined
-    return def
-}
+export type CodeMirrorSuggestion = { label: string, type: string, info: string }
 
 class LanguageAutocomplete {
-    private tables: Array<{ label: string, type: string, info: string }> = []
-    private literals: Array<{ label: string, type: string, info: string }> = [
+    private tables: Array<CodeMirrorSuggestion> = []
+    private default_literals: Array<CodeMirrorSuggestion> = [
         { label: "true", type: "boolean", info: "" },
         { label: "false", type: "boolean", info: "" },
         { label: "null", type: "null", info: "" },
     ];
-    private operators: Array<{ label: string, type: string, info: string }> = [
+    private literals: Array<CodeMirrorSuggestion> = [];
+    private operators: Array<CodeMirrorSuggestion> = [
         { label: "==", type: "operator", info: "" },
         { label: "!=", type: "operator", info: "" },
         { label: ">=", type: "operator", info: "" },
@@ -34,13 +32,15 @@ class LanguageAutocomplete {
         { label: "or", type: "operator", info: "" },
         { label: "startwiths", type: "operator", info: "" },
         { label: "endwiths", type: "operator", info: "" },
+        { label: "contains", type: "operator", info: "" },
     ];
-    constructor(private schema: JSONSchema) {
+    constructor(private schema: EDITOR_INTERFACE_V1) {
         this.updateSchema(schema)
     }
-    public updateSchema(schema: JSONSchema) {
+    public updateSchema(schema: EDITOR_INTERFACE_V1) {
         this.schema = schema
-        this.tables = Object.keys(unwrapJSON(unwrapJSON(this.schema)?.properties?.tables)?.properties ?? []).map(key => {
+        this.literals = [...this.default_literals, ...(schema.suggestions ?? [])]
+        this.tables = Object.keys(this.schema.tables ?? {}).map(key => {
             return { label: key, type: "keyword", info: "" }
         })
     }
@@ -54,7 +54,16 @@ class LanguageAutocomplete {
         return (context: CompletionContext): CompletionResult | null => {
             const before = context.matchBefore(/\"[^\"]+|\'[^\']+/);
             if (before) {
-                return null;
+
+                const options = [
+                    ...this.literals,
+                ].filter(c => c.label.toLowerCase().startsWith(before.text.toLowerCase()))
+                return {
+                    from: before.from,
+                    options: [...options].map(a => {
+                        return { ...a, label: a.label.slice(0, -1) }
+                    })
+                };
             }
             let table = context.matchBefore(/@[\w_]*/);
             if (table) {
@@ -98,22 +107,12 @@ class LanguageAutocomplete {
 
         const parentNode = this.findNodeByPath(parentPath);
         if (!parentNode) return null;
-        const options = unwrapJSON(parentNode)?.properties
+        const options = parentNode
         if (!options) return null;
         const final = Object.keys(options)
             .map(key => {
-                const json = unwrapJSON(options[key])
+                const json = options[key]
                 if (!json) return undefined
-                if (json.anyOf) {
-                    const types = json.anyOf.map(a => unwrapJSON(a)?.type).filter(a => a != undefined).map(a => String(a))
-                    const type = this.mapTypeToCompletionType(types)
-                    return {
-                        label: key,
-                        type: type,
-                        info: "",
-                        detail: type
-                    }
-                }
                 const type = this.mapTypeToCompletionType(String(json.type))
                 return {
                     label: key,
@@ -129,19 +128,19 @@ class LanguageAutocomplete {
             options: final
         };
     }
-    private findNodeByPath(path: string): JSONSchema | undefined {
+    private findNodeByPath(path: string): EDITOR_INTERFACE_V1_TABLE | undefined {
         if (!path) return undefined;
         const parts = path.split('.');
-        if (!unwrapJSON(this.schema)?.properties && !unwrapJSON(this.schema)?.properties?.['tables']) return undefined
-        let currentNodes = unwrapJSON(unwrapJSON(this.schema)?.properties?.tables)?.properties as Record<string, JSONSchema>;
-        let currentNode: JSONSchema | undefined = undefined;
+        if (!this.schema.tables) return undefined
+        let currentNodes = this.schema.tables
+        let currentNode: EDITOR_INTERFACE_V1_TABLE | undefined = undefined;
 
         for (const part of parts) {
             const key = Object.keys(currentNodes).find(key => key === part) || undefined;
             if (!key) return undefined
-            currentNode = unwrapJSON(currentNodes[key]);
-            if (!currentNode || currentNode.type !== 'object') return undefined;
-            currentNodes = currentNode.properties as Record<string, JSONSchema>;
+            currentNode = currentNodes[key];
+            if (!currentNode) return undefined;
+            currentNodes = currentNode.properties as any;
         }
 
         return currentNode;
@@ -216,6 +215,6 @@ export function tabSearchLockInline() {
     })
 }
 
-export function tabSearchAutocomplete(schema: JSONSchema) {
+export function tabSearchAutocomplete(schema: EDITOR_INTERFACE_V1) {
     return new LanguageAutocomplete(schema).getAutocompletion()
 }

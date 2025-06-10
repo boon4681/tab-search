@@ -1,6 +1,6 @@
 {
   "name": "tab-search",
-  "version": "0.1.0c",
+  "version": "0.1.0d",
   "main": "index.js",
   "license": "MIT",
   "type": "module",
@@ -16,8 +16,8 @@
   "repository": "https://github.com/boon4681/tab-search.git",
   "scripts": {
     "dev": "tsup ./{src,tests}/**/*.ts --watch ./{src,tests}/**/*.ts --format cjs,esm --outDir ./dev --onSuccess \"node dev/tests/index.js\"",
-    "build:ohm": "npx ohm generateBundles --withTypes src/ohm/tab-search.ohm",
-    "dev:web": "vite",
+    "build:ohm": "npx ohm generateBundles --withTypes src/ohm/tab-search.ohm && tsx ./build.ohm.ts",
+    "dev:web": "vite --port 5000",
     "build": "tsx watch ./build.ts"
   },
   "peerDependencies": {
@@ -31,6 +31,7 @@
     }
   },
   "devDependencies": {
+    "@hono/node-server": "^1.14.4",
     "@ohm-js/cli": "^2.0.0",
     "@preact/preset-vite": "^2.10.1",
     "@sinclair/typebox": "^0.34.33",
@@ -38,6 +39,7 @@
     "@types/preact-custom-element": "^4.0.4",
     "drizzle-orm": "^0.40.0",
     "esbuild-plugin-alias": "^0.2.1",
+    "hono": "^4.7.11",
     "json-schema-typed": "^8.0.1",
     "tsup": "^8.4.0",
     "tsx": "^4.19.3",

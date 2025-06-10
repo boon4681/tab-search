@@ -2,9 +2,10 @@ import type { ExtractTablesWithRelations, Table, View } from 'drizzle-orm';
 import { Column, getTableColumns, getViewSelectedFields, is, isTable, isView, SQL } from 'drizzle-orm';
 import { parseAST } from '../ast';
 import { transform } from './transform';
-import { tableToTypeBox } from '../utils';
+import { tableToSchemaV1, tableToTypeBox } from '../utils';
 import { AstFunctionResolver, Extension, FunctionExtension } from '../extension';
 import { TProperties, Type } from '@sinclair/typebox';
+import { EDITOR_INTERFACE_V1, EDITOR_INTERFACE_V1_SUGGESTOIN } from '../interface';
 
 export function getColumns(tableLike: Table | View) {
     return isTable(tableLike) ? getTableColumns(tableLike) : getViewSelectedFields(tableLike);
@@ -50,32 +51,46 @@ class DrizzleTab<TOriginSchema extends Record<string, unknown> = Record<string, 
 
 class DrizzleUseTab<TSchema extends Record<string, Table>> {
     private functions: Record<string, AstFunctionResolver>
+    private suggestions: EDITOR_INTERFACE_V1_SUGGESTOIN[] = []
     constructor(
         private tables: TSchema,
         private name: string,
         private table: TSchema[keyof TSchema],
-        options?: { extensions?: Extension[] }
+        private options?: { extensions?: Extension[] }
     ) {
         const functions: Record<string, AstFunctionResolver> = {}
         if (options?.extensions) {
             for (const extension of options.extensions) {
-                functions[extension.name] = extension.resolve
+                if (extension.type == "function.extension") {
+                    functions[extension.name] = extension.resolve
+                }
             }
         }
         this.functions = functions
     }
-    codemirrorSchema() {
-        const preprocess: TProperties = {
-            [this.name]: tableToTypeBox(this.table)
+    async codemirrorSchema() {
+        if (this.options?.extensions) {
+            for (const extension of this.options.extensions) {
+                if (extension.type == "string_suggestion.extension") {
+                    this.suggestions = [...this.suggestions, ...(
+                        typeof extension.resolve == "function" ? await extension.resolve() : extension.resolve
+                    ).map(a => {
+                        return {
+                            label: JSON.stringify(a),
+                            type: "string",
+                            info: ""
+                        }
+                    })]
+                }
+            }
         }
-        // for (const table in tables) {
-        //     preprocess[table.toLowerCase()] = tableToTypeBox(tables[table]!)
-        // }
-        return Type.Object({
-            tables: Type.Object(
-                preprocess
-            )
-        })
+        const schema: EDITOR_INTERFACE_V1 = {
+            tables: {
+                [this.name]: tableToSchemaV1(this.table)
+            },
+            suggestions: this.suggestions
+        }
+        return schema
     }
     async prepare(query: string) {
         const [ast, error] = parseAST(query, this.functions)
