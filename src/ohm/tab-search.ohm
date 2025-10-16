@@ -1,6 +1,7 @@
 Query {
     Query = spaces string -- spacesLeadString
     | spaces DisjunctionQuery -- spacesLead
+    | spaces ident -- spacesIdent
     | spaces -- empty
     | DisjunctionQuery
 

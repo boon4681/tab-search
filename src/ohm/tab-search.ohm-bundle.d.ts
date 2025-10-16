@@ -14,6 +14,7 @@ import {
 export interface QueryActionDict<T> extends BaseActionDict<T> {
   Query_spacesLeadString?: (this: NonterminalNode, arg0: NonterminalNode, arg1: NonterminalNode) => T;
   Query_spacesLead?: (this: NonterminalNode, arg0: NonterminalNode, arg1: NonterminalNode) => T;
+  Query_spacesIdent?: (this: NonterminalNode, arg0: NonterminalNode, arg1: NonterminalNode) => T;
   Query_empty?: (this: NonterminalNode, arg0: NonterminalNode) => T;
   Query?: (this: NonterminalNode, arg0: NonterminalNode) => T;
   DisjunctionQuery_or?: (this: NonterminalNode, arg0: NonterminalNode, arg1: NonterminalNode, arg2: TerminalNode, arg3: NonterminalNode, arg4: NonterminalNode) => T;

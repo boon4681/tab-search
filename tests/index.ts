@@ -19,16 +19,22 @@ const testcases = [
     String.raw` @user.id == 10`,
     String.raw`@user.id >= 10 and @user.username startwiths 'CSPD'`,
     String.raw`@user.updated_at >= "2025-05-21"`,
-    String.raw`"HI"`
+    String.raw`"HI"`,
+    String.raw`Testing`
 ]
-for (const test of testcases) {
-    try {
-        console.log(d.prepare(test))
-        console.log(d.codemirrorSchema())
-    } catch (error) {
-        console.log(error)
-        // break
-    }
+
+{
+    (async () => {
+        for (const test of testcases) {
+            try {
+                console.log(await d.prepare(test))
+                console.log(await d.codemirrorSchema())
+            } catch (error) {
+                console.log(error)
+                // break
+            }
+        }
+    })()
 }
 
 

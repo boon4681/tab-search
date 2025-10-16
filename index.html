@@ -13,10 +13,10 @@
   <script>
     const ele = document.getElementById("test")
     ele.onchange = (e) => {
-      console.log(e.detail)
+      console.log("CHANGE", e.detail)
     }
-    ele.oninput = (e) => {
-      console.log(e.detail)
+    ele.onsubmit = (e) => {
+      console.log("SUBMIT", e.detail)
     }
   </script>
   <script type="module" src="/src/codemirror/index.ts"></script>
