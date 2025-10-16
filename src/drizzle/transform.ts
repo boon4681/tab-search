@@ -1,5 +1,5 @@
 import { and, eq, getTableColumns, getTableName, ne, gte, lte, lt, or, SQL, SQLWrapper, Table, gt, Column, like, isNull, isNotNull } from "drizzle-orm";
-import { AstQuery, AstQueryAnd, AstQueryComparison, AstQueryOr, Literal } from "../ast.internal.types";
+import { AstQuery, AstQueryAnd, AstQueryComparison, AstQueryTextSearch, AstQueryOr, Literal } from "../ast.internal.types";
 import { AssertError, Value } from "@sinclair/typebox/value";
 import { resolveSafeParse, StringToDate } from "../typebox";
 
@@ -93,6 +93,16 @@ function transformQueryComparison(table: Table, ast: AstQueryComparison) {
     }
 }
 
+function transfromQueryText(table: Table, ast: AstQueryTextSearch) {
+    const columns = getTableColumns(table)
+    const list = []
+    for (const kcol in columns) {
+        const column = columns[kcol]!
+        list.push(like(column, "%" + ast.value + "%"))
+    }
+    return or(...list)
+}
+
 export function transform(table: Table<any>, ast: AstQuery): SQL {
     switch (ast.type) {
         case "query_or":
@@ -101,6 +111,8 @@ export function transform(table: Table<any>, ast: AstQuery): SQL {
             return transformQueryAnd(table, ast)!
         case "query_comparison":
             return transformQueryComparison(table, ast)
+        case "query_text":
+            return transfromQueryText(table, ast)!
     }
     throw new Error("Unreachable code.")
 }

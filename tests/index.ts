@@ -14,21 +14,22 @@ const d = Tab(schema).use("USER", schema.USER, {
     ]
 })
 
-// const testcases = [
-//     String.raw`   `,
-//     String.raw` @user.id == 10`,
-//     String.raw`@user.id >= 10 and @user.username startwiths 'CSPD'`,
-//     String.raw`@user.updated_at >= "2025-05-21"`,
-// ]
-// for (const test of testcases) {
-//     try {
-//         console.log(d.prepare(test))
-//         console.log(d.codemirrorSchema())
-//     } catch (error) {
-//         console.log(error)
-//         // break
-//     }
-// }
+const testcases = [
+    String.raw`   `,
+    String.raw` @user.id == 10`,
+    String.raw`@user.id >= 10 and @user.username startwiths 'CSPD'`,
+    String.raw`@user.updated_at >= "2025-05-21"`,
+    String.raw`"HI"`
+]
+for (const test of testcases) {
+    try {
+        console.log(d.prepare(test))
+        console.log(d.codemirrorSchema())
+    } catch (error) {
+        console.log(error)
+        // break
+    }
+}
 
 
 const app = new Hono()

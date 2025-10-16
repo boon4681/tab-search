@@ -56,12 +56,12 @@ export default function StarterKit(options: {
                 overflow: "hidden",
             },
         }),
-        keymap.of([
-            {
-                key: "Enter",
-                run: () => true, // Capture Enter key and do nothing
-            },
-        ]),
+        // keymap.of([
+        //     {
+        //         key: "Enter",
+        //         run: () => true, // Capture Enter key and do nothing
+        //     },
+        // ]),
         // tab search extension
         languageCompartment.of(tabSearchHighlighter()),
         tabSearchLockInline(),

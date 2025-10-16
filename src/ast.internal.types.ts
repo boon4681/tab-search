@@ -1,6 +1,6 @@
 import { LineAndColumnInfo } from "ohm-js"
 
-export type AstQuery = AstQueryOr | AstQueryAnd | AstQueryComparison
+export type AstQuery = AstQueryOr | AstQueryAnd | AstQueryComparison | AstQueryTextSearch
 
 // export type Literal = string | number | boolean | null
 export interface Literal {
@@ -34,6 +34,11 @@ export interface AstQueryAnd {
     type: 'query_and',
     left: AstQuery,
     right: AstQuery
+}
+
+export interface AstQueryTextSearch {
+    type: 'query_text',
+    value: string
 }
 
 export interface AstFunction {

@@ -1,7 +1,7 @@
 import grammar, { QueryActionDict } from "@parser/tab-search.ohm-bundle";
 // const grammar = require("@parser/tab-search.ohm-bundle")
 import { NonterminalNode as NtN, TerminalNode as TN, IterationNode as IN, Node } from "ohm-js";
-import { AstFunction, AstQuery, AstQueryAnd, AstQueryComparison, AstQueryOr, AstTable, Literal } from "./ast.internal.types";
+import { AstFunction, AstQuery, AstQueryAnd, AstQueryComparison, AstQueryTextSearch, AstQueryOr, AstTable, Literal } from "./ast.internal.types";
 import { AstFunctionResolver, FunctionExtension } from "./extension";
 
 export function parseAST(query: string, functions: Record<string, AstFunctionResolver> = {}) {
@@ -15,6 +15,12 @@ export function parseAST(query: string, functions: Record<string, AstFunctionRes
             },
             Query_spacesLead: function (this: NtN, arg0, arg1) {
                 return arg1.visit()
+            },
+            Query_spacesLeadString: function (this: NtN, arg0, arg1) {
+                return {
+                    type: "query_text",
+                    value: arg1.visit()
+                } satisfies AstQueryTextSearch
             },
             DisjunctionQuery_or: function (this: NtN, arg0: NtN, arg1: NtN, arg2: TN, arg3: NtN, arg4: NtN) {
                 return {
