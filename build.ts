@@ -23,12 +23,10 @@ const main = async () => {
 		outExtension: (ctx) => {
 			if (ctx.format === 'cjs') {
 				return {
-					dts: '.d.ts',
-					js: '.js',
+					js: '.cjs',
 				};
 			}
 			return {
-				dts: '.d.mts',
 				js: '.mjs',
 			};
 		},
