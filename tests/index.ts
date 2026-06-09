@@ -26,13 +26,9 @@ const testcases = [
 {
     (async () => {
         for (const test of testcases) {
-            try {
-                console.log(await d.prepare(test))
-                console.log(await d.codemirrorSchema())
-            } catch (error) {
-                console.log(error)
-                // break
-            }
+            const [where, error] = await d.prepare(test)
+            console.log(error ?? where)
+            console.log(await d.codemirrorSchema())
         }
     })()
 }

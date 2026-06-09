@@ -1,18 +1,21 @@
-import * as esbuild from 'esbuild';
 import * as tsup from 'tsup';
-import alias from "esbuild-plugin-alias";
 
 const main = async () => {
+	const watch = process.argv.includes('--watch');
+
 	await tsup.build({
-		entryPoints: ['./src/**/*.{ts,tsx,js,css}'],
+		entryPoints: [
+			'./src/**/*.{ts,tsx,js,css}',
+			'!./src/**/*.test.{ts,tsx,js}',
+		],
 		outDir: './dist',
 		external: [
-			'dizzle-orm',
+			'drizzle-orm',
 			'ohm-js',
 			'@sinclair/typebox',
 			'json-schema-typed'
 		],
-		watch: ['./src/**/*.{ts,tsx,js,css}'],
+		watch: watch ? ['./src/**/*.{ts,tsx,js,css}'] : false,
 		splitting: true,
 		dts: true,
 		clean: true,

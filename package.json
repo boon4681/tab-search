@@ -1,12 +1,13 @@
 {
   "name": "tab-search",
-  "version": "0.1.0d",
+  "version": "0.1.1",
   "main": "index.js",
   "license": "MIT",
   "type": "module",
   "files": [
     "dist",
-    "src"
+    "src",
+    "!src/**/*.test.*"
   ],
   "engines": {
     "node": ">=20.0.0"
@@ -15,10 +16,12 @@
   "homepage": "https://www.boon4681.com/",
   "repository": "https://github.com/boon4681/tab-search.git",
   "scripts": {
+    "test": "vitest run",
     "dev": "tsup ./{src,tests}/**/*.ts --watch ./{src,tests}/**/*.ts --format cjs,esm --outDir ./dev --onSuccess \"node dev/tests/index.js\"",
     "build:ohm": "npx ohm generateBundles --withTypes src/ohm/tab-search.ohm && tsx ./build.ohm.ts",
+    "build:watch": "tsx ./build.ts --watch",
     "dev:web": "vite --port 5000",
-    "build": "tsx watch ./build.ts"
+    "build": "tsx ./build.ts"
   },
   "peerDependencies": {
     "@sinclair/typebox": ">=0.34.33",
@@ -37,26 +40,31 @@
     "@sinclair/typebox": "^0.34.33",
     "@types/node": "^22.15.16",
     "@types/preact-custom-element": "^4.0.4",
+    "codemirror": "^6.0.1",
     "drizzle-orm": "^0.40.0",
     "esbuild-plugin-alias": "^0.2.1",
     "hono": "^4.7.11",
+    "jsdom": "^26.1.0",
     "json-schema-typed": "^8.0.1",
     "tsup": "^8.4.0",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
-    "@codemirror/autocomplete": "^6.18.6",
-    "@codemirror/language": "^6.11.0",
-    "@codemirror/legacy-modes": "^6.5.1",
-    "@codemirror/search": "^6.5.10",
-    "@codemirror/state": "^6.5.2",
-    "@codemirror/view": "^6.36.7",
-    "codemirror": "^6.0.1",
+    "@codemirror/autocomplete": "^6.0.0",
+    "@codemirror/commands": "^6.0.0",
+    "@codemirror/language": "^6.0.0",
+    "@codemirror/legacy-modes": "^6.0.0",
+    "@codemirror/search": "^6.0.0",
+    "@codemirror/state": "^6.0.0",
+    "@codemirror/view": "^6.0.0",
+    "@lezer/highlight": "^1.0.0",
     "ohm-js": "^17.1.0",
     "preact": "^10.26.6",
-    "preact-custom-element": "^4.3.0"
+    "preact-custom-element": "^4.3.0",
+    "style-mod": "^4.0.0"
   },
   "exports": {
     ".": {

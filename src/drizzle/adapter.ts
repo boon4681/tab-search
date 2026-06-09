@@ -7,6 +7,14 @@ import { AstFunctionResolver, Extension, FunctionExtension } from '../extension'
 import { TProperties, Type } from '@sinclair/typebox';
 import { EDITOR_INTERFACE_V1, EDITOR_INTERFACE_V1_SUGGESTOIN } from '../interface';
 
+export type DrizzlePrepareResult =
+    | readonly [where: SQL | undefined, error: undefined]
+    | readonly [where: undefined, error: Error]
+
+function toError(error: unknown) {
+    return error instanceof Error ? error : new Error(String(error))
+}
+
 export function getColumns(tableLike: Table | View) {
     return isTable(tableLike) ? getTableColumns(tableLike) : getViewSelectedFields(tableLike);
 }
@@ -92,13 +100,19 @@ class DrizzleUseTab<TSchema extends Record<string, Table>> {
         }
         return schema
     }
-    async prepare(query: string) {
-        const [ast, error] = parseAST(query, this.functions)
-        if (error) {
-            throw new Error(error)
+    async prepare(query: string): Promise<DrizzlePrepareResult> {
+        try {
+            const [ast, error] = parseAST(query, this.functions)
+            if (error) {
+                return [undefined, new Error(error)] as const
+            }
+            if (!ast) {
+                return [undefined, undefined] as const
+            }
+            return [transform(this.table, ast), undefined] as const
+        } catch (error) {
+            return [undefined, toError(error)] as const
         }
-        if (ast) return transform(this.table, ast)
-        return undefined
     }
 }
 

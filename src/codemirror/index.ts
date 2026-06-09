@@ -1,6 +1,11 @@
 
-export * from "./extensions"
+import "./editor";
 
-if (typeof window !== 'undefined') {
-    import("./editor")
-}
+export * from "./extensions";
+export type {
+    TabSearchChangeDetail,
+    TabSearchElement,
+    TabSearchErrorDetail,
+    TabSearchProps,
+    TabSearchReadyDetail,
+} from "./editor";

@@ -1,14 +1,9 @@
 import {
-    defaultHighlightStyle,
-    syntaxHighlighting,
-    bracketMatching,
     StreamLanguage,
-    syntaxTree,
 } from "@codemirror/language";
-import { EditorState, Compartment } from "@codemirror/state";
+import { EditorState } from "@codemirror/state";
 import { simpleMode } from "@codemirror/legacy-modes/mode/simple-mode";
 import { autocompletion, CompletionContext, type CompletionResult } from "@codemirror/autocomplete";
-import { TSchema } from "@sinclair/typebox";
 import { EDITOR_INTERFACE_V1, EDITOR_INTERFACE_V1_TABLE } from "../interface";
 
 export type CodeMirrorSuggestion = { label: string, type: string, info: string }

@@ -1,7 +1,6 @@
-import { history, indentWithTab } from "@codemirror/commands";
-import { EditorView, basicSetup } from "codemirror";
+import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import {
-    lineNumbers,
+    EditorView,
     keymap,
     rectangularSelection,
     placeholder as placeholderExt,
@@ -10,13 +9,12 @@ import {
     highlightActiveLineGutter,
     drawSelection,
 } from "@codemirror/view";
-import { indentUnit, foldGutter, bracketMatching } from "@codemirror/language";
+import { bracketMatching } from "@codemirror/language";
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
-import { autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
-import { EditorState, Compartment } from "@codemirror/state";
+import { completionKeymap, closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
+import { Compartment, Prec, type Extension } from "@codemirror/state";
 import { tabSearchAutocomplete, tabSearchHighlighter, tabSearchLockInline } from "./extensions";
 import { LightTheme, DarkTheme } from './theme';
-import { type JSONSchema } from "json-schema-typed/draft-07";
 import { EDITOR_INTERFACE_V1 } from "../interface";
 
 export default function StarterKit(options: {
@@ -27,6 +25,7 @@ export default function StarterKit(options: {
     const languageCompartment = new Compartment();
     const placeholderCompartment = new Compartment();
     const themeCompartment = new Compartment();
+    const schemaCompartment = new Compartment();
     const themes = (theme: "dark" | "light" | string) => {
         if (theme == "dark") {
             return DarkTheme;
@@ -34,7 +33,63 @@ export default function StarterKit(options: {
             return LightTheme;
         }
     };
-    const extensions = [
+    const componentStyles = EditorView.theme({
+        "&": {
+            margin: "0.25em",
+            outline: "none",
+            fontFamily: "monospace",
+            overflow: "hidden",
+        },
+        "&.cm-focused": {
+            outline: "none",
+        },
+        ".cm-content": {
+            overflow: "hidden",
+        },
+        ".cm-scroller": {
+            flexGrow: "1",
+            overflow: "hidden",
+            outline: "0 !important",
+        },
+        ".cm-tooltip-autocomplete": {
+            zIndex: "9999",
+            padding: "0",
+            fontSize: "1em",
+            border: "1px solid rgb(106, 106, 106)",
+            borderRadius: "0.5em",
+        },
+        ".cm-tooltip-autocomplete ul": {
+            margin: "0",
+            borderRadius: "inherit",
+        },
+        ".cm-tooltip-autocomplete ul > :first-child": {
+            borderTopLeftRadius: "inherit",
+            borderTopRightRadius: "inherit",
+        },
+        ".cm-tooltip-autocomplete ul > :last-child": {
+            borderBottomLeftRadius: "inherit",
+            borderBottomRightRadius: "inherit",
+        },
+        ".cm-tooltip-autocomplete ul li": {
+            display: "flex",
+        },
+        ".cm-tooltip-autocomplete .cm-completionDetail": {
+            marginLeft: "auto",
+        },
+        ".cm-tooltip-autocomplete ul li[aria-selected]": {
+            background: "rgb(59 130 246)",
+        },
+        ".cm-cursorLayer .cm-cursor": {
+            marginLeft: "0 !important",
+        },
+        ".cm-placeholder": {
+            fontSize: "1em",
+        },
+        "&.cm-focused .cm-matchingBracket": {
+            backgroundColor: "rgba(50, 140, 130, 0.1)",
+        },
+    });
+    const extensions: Extension[] = [
         EditorView.lineWrapping,
         highlightActiveLineGutter(),
         highlightSpecialChars(),
@@ -45,36 +100,38 @@ export default function StarterKit(options: {
         closeBrackets(),
         rectangularSelection(),
         highlightSelectionMatches(),
-        EditorView.theme({
-            "&": {
-                overflow: "hidden",
-            },
-            ".cm-content": {
-                overflow: "hidden",
-            },
-            ".cm-scroller": {
-                overflow: "hidden",
-            },
-        }),
-        // keymap.of([
-        //     {
-        //         key: "Enter",
-        //         run: () => true, // Capture Enter key and do nothing
-        //     },
-        // ]),
-        // tab search extension
+        Prec.highest(keymap.of(completionKeymap)),
+        keymap.of([
+            ...closeBracketsKeymap,
+            ...searchKeymap,
+            ...historyKeymap,
+            ...defaultKeymap,
+        ]),
+        componentStyles,
         languageCompartment.of(tabSearchHighlighter()),
         tabSearchLockInline(),
-        tabSearchAutocomplete(options.schema)
+        schemaCompartment.of(tabSearchAutocomplete(options.schema)),
+        placeholderCompartment.of(options.placeholder ? placeholderExt(options.placeholder) : []),
+        themeCompartment.of(themes(options.theme ?? "light")),
     ]
-    if (options.placeholder) {
-        extensions.push(placeholderCompartment.of(placeholderExt(options.placeholder)))
-    }
-    function changeTheme(editor: EditorView, theme: "dark" | "light") {
+
+    function changeTheme(editor: EditorView, theme: "dark" | "light" | string = "light") {
         editor.dispatch({
             effects: themeCompartment.reconfigure(themes(theme))
         })
     }
-    extensions.push(themeCompartment.of(themes(options.theme ?? "light")))
-    return { extensions, changeTheme }
+
+    function changePlaceholder(editor: EditorView, placeholder?: string) {
+        editor.dispatch({
+            effects: placeholderCompartment.reconfigure(placeholder ? placeholderExt(placeholder) : [])
+        })
+    }
+
+    function changeSchema(editor: EditorView, schema: EDITOR_INTERFACE_V1) {
+        editor.dispatch({
+            effects: schemaCompartment.reconfigure(tabSearchAutocomplete(schema))
+        })
+    }
+
+    return { extensions, changeTheme, changePlaceholder, changeSchema }
 }

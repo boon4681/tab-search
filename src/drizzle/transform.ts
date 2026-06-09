@@ -93,14 +93,13 @@ function transformQueryComparison(table: Table, ast: AstQueryComparison) {
     }
 }
 
-function transfromQueryText(table: Table, ast: AstQueryTextSearch) {
+function transformQueryText(table: Table, ast: AstQueryTextSearch) {
     const columns = getTableColumns(table)
-    const list = []
-    for (const kcol in columns) {
-        const column = columns[kcol]!
-        list.push(like(column, "%" + ast.value + "%"))
+    const searchableColumns = Object.values(columns).filter((column) => column.dataType === "string")
+    if (!searchableColumns.length) {
+        throw new Error(`Table ${JSON.stringify(getTableName(table))} has no text columns for broad search.`)
     }
-    return or(...list)
+    return or(...searchableColumns.map((column) => like(column, `%${ast.value}%`)))!
 }
 
 export function transform(table: Table<any>, ast: AstQuery): SQL {
@@ -112,7 +111,7 @@ export function transform(table: Table<any>, ast: AstQuery): SQL {
         case "query_comparison":
             return transformQueryComparison(table, ast)
         case "query_text":
-            return transfromQueryText(table, ast)!
+            return transformQueryText(table, ast)
     }
     throw new Error("Unreachable code.")
 }

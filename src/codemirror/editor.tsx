@@ -1,75 +1,183 @@
-import { createRef } from "preact";
 import register from "preact-custom-element";
-import { useEffect, useRef, useState } from "preact/hooks";
-import { EditorView, basicSetup } from "codemirror";
-import { EditorState, Compartment } from "@codemirror/state";
+import { useEffect, useRef } from "preact/hooks";
+import { EditorView, keymap } from "@codemirror/view";
+import { Prec } from "@codemirror/state";
 import StarterKit from "./starter-kit";
-import { type JSONSchema } from "json-schema-typed/draft-07";
-import { keymap } from "@codemirror/view";
 import { EDITOR_INTERFACE_V1 } from "../interface";
 
 export interface TabSearchProps {
     placeholder?: string
-    src: string
+    src?: string
+    schema?: EDITOR_INTERFACE_V1 | string
     theme?: string
+    value?: string
 }
 
-function TabSearch({ placeholder, src, theme }: TabSearchProps) {
-    if (!src) throw new Error("TabSearch Missing src attribute")
-    const ref = createRef<HTMLDivElement>()
-    const shadowDoc = createRef<string>()
-    const [editor, setEditor] = useState<EditorView>()
-    const [ready, setReady] = useState<boolean>(false)
-    const [schema, setSchema] = useState<EDITOR_INTERFACE_V1>({})
-    const starterKit = StarterKit({ placeholder, schema, theme })
-    // console.log()
-    useEffect(() => {
-        fetch(src).then(res => res.json()).then(json => {
-            setSchema(json)
-            setReady(true)
-        }).catch(() => setReady(true))
-    }, [])
+export interface TabSearchChangeDetail {
+    doc: string
+}
+
+export interface TabSearchReadyDetail {
+    schema: EDITOR_INTERFACE_V1
+    src?: string
+}
+
+export interface TabSearchErrorDetail {
+    error: unknown
+    src?: string
+}
+
+export interface TabSearchElement extends HTMLElement, TabSearchProps {}
+
+declare global {
+    interface HTMLElementTagNameMap {
+        "tab-search": TabSearchElement
+    }
+}
+
+const hostStyles = `
+    :host {
+        display: block;
+        min-height: 28px;
+    }
+`;
+
+function TabSearch({ placeholder, src, schema, theme, value }: TabSearchProps) {
+    const ref = useRef<HTMLDivElement>(null)
+    const editorRef = useRef<EditorView | null>(null)
+    const starterKitRef = useRef<ReturnType<typeof StarterKit> | null>(null)
+    const syncingValueRef = useRef(false)
 
     useEffect(() => {
-        if (!ready || !editor) return;
-        starterKit.changeTheme(editor, theme as any)
-    }, [theme, ready, editor])
+        const self = ref.current
+        if (!self) return
 
-    useEffect(() => {
-        if (!ready || editor) return;
-        const self = ref.current!
-        const docChangeExtension = EditorView.updateListener.of((v) => {
-            const doc = v.state.doc.toString()
-            shadowDoc.current = doc + ""
+        const starterKit = StarterKit({ placeholder, schema: {}, theme })
+        const docChangeExtension = EditorView.updateListener.of((update) => {
+            if (!update.docChanged) return
+            if (syncingValueRef.current) {
+                syncingValueRef.current = false
+                return
+            }
+            const doc = update.state.doc.toString()
             self.dispatchEvent(new CustomEvent("change", {
                 detail: { doc }, composed: true, bubbles: true
             }))
         });
-        let cm = new EditorView({
+        const submitKeymap = Prec.high(keymap.of([
+            {
+                key: "Enter",
+                run: (view) => {
+                    self.dispatchEvent(new CustomEvent("submit", {
+                        detail: { doc: view.state.doc.toString() }, composed: true, bubbles: true
+                    }))
+                    return true
+                },
+            },
+        ]))
+        const editor = new EditorView({
+            doc: value ?? "",
             extensions: [
                 docChangeExtension,
-                keymap.of([
-                    {
-                        key: "Enter",
-                        run: () => {
-                            // trigger submit on enter for singleline input
-                            self.dispatchEvent(new CustomEvent("submit", {
-                                detail: { doc: shadowDoc.current }, composed: true, bubbles: true
-                            }))
-                            return true
-                        },
-                    },
-                ]),
                 starterKit.extensions,
+                submitKeymap,
             ],
-            parent: ref.current!,
+            parent: self,
         })
-        setEditor(cm)
+
+        starterKitRef.current = starterKit
+        editorRef.current = editor
+
         return () => {
-            cm.destroy()
+            editor.destroy()
+            editorRef.current = null
+            starterKitRef.current = null
         }
-    }, [ready])
-    return <div className="tab-search" ref={ref}></div>
+    }, [])
+
+    useEffect(() => {
+        const editor = editorRef.current
+        const starterKit = starterKitRef.current
+        if (!editor || !starterKit) return
+        starterKit.changeTheme(editor, theme)
+    }, [theme])
+
+    useEffect(() => {
+        const editor = editorRef.current
+        const starterKit = starterKitRef.current
+        if (!editor || !starterKit) return
+        starterKit.changePlaceholder(editor, placeholder)
+    }, [placeholder])
+
+    useEffect(() => {
+        const editor = editorRef.current
+        if (!editor || value === undefined) return
+        const currentValue = editor.state.doc.toString()
+        if (currentValue === value) return
+
+        syncingValueRef.current = true
+        editor.dispatch({
+            changes: { from: 0, to: editor.state.doc.length, insert: value },
+            selection: { anchor: value.length },
+        })
+    }, [value])
+
+    useEffect(() => {
+        const editor = editorRef.current
+        const starterKit = starterKitRef.current
+        const self = ref.current
+        if (!editor || !starterKit || !self) return
+
+        const applySchema = (nextSchema: EDITOR_INTERFACE_V1 | string) => {
+            try {
+                const parsed = typeof nextSchema === "string"
+                    ? JSON.parse(nextSchema) as EDITOR_INTERFACE_V1
+                    : nextSchema
+                starterKit.changeSchema(editor, parsed)
+                self.dispatchEvent(new CustomEvent("ready", {
+                    detail: { schema: parsed, src }, composed: true, bubbles: true
+                }))
+            } catch (error) {
+                self.dispatchEvent(new CustomEvent("error", {
+                    detail: { error, src }, composed: true, bubbles: true
+                }))
+            }
+        }
+
+        if (schema !== undefined) {
+            applySchema(schema)
+            return
+        }
+        if (!src) {
+            applySchema({})
+            return
+        }
+
+        const controller = new AbortController()
+        fetch(src, { signal: controller.signal })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`Unable to load tab-search schema: ${response.status} ${response.statusText}`)
+                }
+                return response.json()
+            })
+            .then(applySchema)
+            .catch((error) => {
+                if (controller.signal.aborted) return
+                self.dispatchEvent(new CustomEvent("error", {
+                    detail: { error, src }, composed: true, bubbles: true
+                }))
+            })
+
+        return () => controller.abort()
+    }, [schema, src])
+
+    return <>
+        <style>{hostStyles}</style>
+        <div className="tab-search" ref={ref}></div>
+    </>
 }
 
-register(TabSearch, "tab-search", ["placeholder", "src", "theme"], { shadow: false });
+if (typeof customElements !== "undefined" && !customElements.get("tab-search")) {
+    register(TabSearch, "tab-search", ["placeholder", "src", "schema", "theme", "value"], { shadow: true });
+}

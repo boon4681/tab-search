@@ -1,4 +1,4 @@
-import { EditorView, basicSetup } from "codemirror";
+import { EditorView } from "@codemirror/view";
 import { Extension } from '@codemirror/state';
 import { HighlightStyle, type TagStyle, syntaxHighlighting } from '@codemirror/language';
 import type { StyleSpec } from 'style-mod';
