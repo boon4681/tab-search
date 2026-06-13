@@ -1,4 +1,4 @@
-import { and, eq, getTableColumns, getTableName, ne, gte, lte, lt, or, SQL, SQLWrapper, Table, gt, Column, like, isNull, isNotNull } from "drizzle-orm";
+import { and, eq, getTableColumns, getTableName, ne, gte, lte, lt, or, SQL, Table, gt, Column, isNull, isNotNull, ilike } from "drizzle-orm";
 import { AstQuery, AstQueryAnd, AstQueryComparison, AstQueryTextSearch, AstQueryOr, Literal } from "../ast.internal.types";
 import { AssertError, Value } from "@sinclair/typebox/value";
 import { resolveSafeParse, StringToDate } from "../typebox";
@@ -85,11 +85,11 @@ function transformQueryComparison(table: Table, ast: AstQueryComparison) {
         case "<":
             return lt(column, cast)
         case "startwiths":
-            return like(column, cast + "%")
+            return ilike(column, cast + "%")
         case "endwiths":
-            return like(column, "%" + cast)
+            return ilike(column, "%" + cast)
         case "contains":
-            return like(column, "%" + cast + "%")
+            return ilike(column, "%" + cast + "%")
     }
 }
 
@@ -99,7 +99,7 @@ function transformQueryText(table: Table, ast: AstQueryTextSearch) {
     if (!searchableColumns.length) {
         throw new Error(`Table ${JSON.stringify(getTableName(table))} has no text columns for broad search.`)
     }
-    return or(...searchableColumns.map((column) => like(column, `%${ast.value}%`)))!
+    return or(...searchableColumns.map((column) => ilike(column, `%${ast.value}%`)))!
 }
 
 export function transform(table: Table<any>, ast: AstQuery): SQL {

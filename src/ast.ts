@@ -28,6 +28,12 @@ export function parseAST(query: string, functions: Record<string, AstFunctionRes
                     value: arg1.sourceString
                 } satisfies AstQueryTextSearch
             },
+            Query_spacesNumber: function (this: NtN, arg0, arg1) {
+                return {
+                    type: "query_text",
+                    value: arg1.sourceString
+                } satisfies AstQueryTextSearch
+            },
             DisjunctionQuery_or: function (this: NtN, arg0: NtN, arg1: NtN, arg2: TN, arg3: NtN, arg4: NtN) {
                 return {
                     type: 'query_or',
