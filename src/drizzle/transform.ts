@@ -95,11 +95,30 @@ function transformQueryComparison(table: Table, ast: AstQueryComparison) {
 
 function transformQueryText(table: Table, ast: AstQueryTextSearch) {
     const columns = getTableColumns(table)
-    const searchableColumns = Object.values(columns).filter((column) => column.dataType === "string")
-    if (!searchableColumns.length) {
-        throw new Error(`Table ${JSON.stringify(getTableName(table))} has no text columns for broad search.`)
+    const conditions: SQL[] = []
+
+    for (const column of Object.values(columns)) {
+        if (column.dataType === "string") {
+            conditions.push(ilike(column, `%${ast.value}%`))
+        }
     }
-    return or(...searchableColumns.map((column) => ilike(column, `%${ast.value}%`)))!
+    
+    const trimmed = ast.value.trim()
+    if (/^[+-]?(\d+\.?\d*|\.\d+)$/.test(trimmed)) {
+        const num = Number(trimmed)
+        for (const column of Object.values(columns)) {
+            if (column.dataType === "number" && Number.isFinite(num)) {
+                conditions.push(eq(column, num))
+            } else if (column.dataType === "bigint" && Number.isInteger(num)) {
+                conditions.push(eq(column, BigInt(trimmed)))
+            }
+        }
+    }
+
+    if (!conditions.length) {
+        throw new Error(`Table ${JSON.stringify(getTableName(table))} has no searchable columns for broad search.`)
+    }
+    return or(...conditions)!
 }
 
 export function transform(table: Table<any>, ast: AstQuery): SQL {

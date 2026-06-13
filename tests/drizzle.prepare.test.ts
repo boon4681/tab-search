@@ -48,12 +48,27 @@ describe("Drizzle prepare", () => {
 
         const query = dialect.sqlToQuery(where!);
         expect(query.params).toContain("%สวัสดี%");
-        expect(query.sql).toContain('"email" like');
-        expect(query.sql).toContain('"name" like');
-        expect(query.sql).not.toContain('"id" like');
-        expect(query.sql).not.toContain('"is_suspended" like');
-        expect(query.sql).not.toContain('"meta" like');
-        expect(query.sql).not.toContain('"created_at" like');
+        expect(query.sql).toContain('"email" ilike');
+        expect(query.sql).toContain('"name" ilike');
+        expect(query.sql).not.toContain('"id" ilike');
+        expect(query.sql).not.toContain('"is_suspended" ilike');
+        expect(query.sql).not.toContain('"meta" ilike');
+        expect(query.sql).not.toContain('"created_at" ilike');
+    });
+
+    test("broad-searches a numeric term against numeric columns too", async () => {
+        const [where, error] = await users.prepare("42");
+
+        expect(error).toBeUndefined();
+        expect(where).toBeInstanceOf(SQL);
+
+        const query = dialect.sqlToQuery(where!);
+        // still matches text columns as a substring...
+        expect(query.params).toContain("%42%");
+        expect(query.sql).toContain('"name" ilike');
+        // ...and additionally matches the numeric id column by equality
+        expect(query.sql).toContain('"id" =');
+        expect(query.params).toContain(42);
     });
 
     test("returns an error when broad search has no text columns", async () => {
@@ -65,6 +80,6 @@ describe("Drizzle prepare", () => {
         const [where, error] = await metricsSearch.prepare("สวัสดี");
 
         expect(where).toBeUndefined();
-        expect(error?.message).toContain("no text columns");
+        expect(error?.message).toContain("no searchable columns");
     });
 });

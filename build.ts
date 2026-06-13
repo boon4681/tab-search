@@ -1,7 +1,10 @@
+import { rmdirSync } from 'node:fs';
 import * as tsup from 'tsup';
 
 const main = async () => {
 	const watch = process.argv.includes('--watch');
+
+	rmdirSync("./dist", { recursive: true })
 
 	await tsup.build({
 		entryPoints: [
