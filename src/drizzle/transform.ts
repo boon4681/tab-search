@@ -55,6 +55,10 @@ function transformQueryAnd(table: Table, ast: AstQueryAnd) {
     return and(...[left, right])
 }
 
+function isTextSearchable(column: Column) {
+    return column.dataType === "string" && column.enumValues === undefined
+}
+
 function transformQueryComparison(table: Table, ast: AstQueryComparison) {
     const columns = getTableColumns(table)
     const tableName = getTableName(table)
@@ -85,10 +89,13 @@ function transformQueryComparison(table: Table, ast: AstQueryComparison) {
         case "<":
             return lt(column, cast)
         case "startwiths":
-            return ilike(column, cast + "%")
         case "endwiths":
-            return ilike(column, "%" + cast)
         case "contains":
+            if (!isTextSearchable(column)) {
+                throw new Error(`Operator ${JSON.stringify(ast.comparator)} is not supported on ${tableName}.${column.name} of type ${column.getSQLType()}.`)
+            }
+            if (ast.comparator == "startwiths") return ilike(column, cast + "%")
+            if (ast.comparator == "endwiths") return ilike(column, "%" + cast)
             return ilike(column, "%" + cast + "%")
     }
 }
@@ -98,8 +105,10 @@ function transformQueryText(table: Table, ast: AstQueryTextSearch) {
     const conditions: SQL[] = []
 
     for (const column of Object.values(columns)) {
-        if (column.dataType === "string") {
+        if (isTextSearchable(column)) {
             conditions.push(ilike(column, `%${ast.value}%`))
+        } else if (column.enumValues !== undefined && column.enumValues.includes(ast.value)) {
+            conditions.push(eq(column, ast.value))
         }
     }
     
