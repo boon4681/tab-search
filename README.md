@@ -90,6 +90,57 @@ Events:
 
 Entering plain text, for example `สวัสดี`, performs a broad `LIKE` search across the selected table's text columns.
 
+### Theming
+
+The editor renders in shadow DOM, so external selectors like `tab-search .cm-content { ... }` will **not** reach inside. Theming is done via CSS custom properties on the host - custom properties inherit through the shadow boundary.
+
+Override any subset of these on the `tab-search` element:
+
+```css
+tab-search {
+    /* Editor chrome */
+    --ts-background: #fff;
+    --ts-foreground: #24292e;
+    --ts-caret: #24292e;
+    --ts-selection: #bbdfff;
+    --ts-selection-match: #bbdfff;
+    --ts-line-highlight: #f6f8fa;
+    --ts-gutter-background: #fff;
+    --ts-gutter-foreground: #6e7781;
+
+    /* Syntax */
+    --ts-keyword: #d73a49;
+    --ts-string: #22863a;
+    --ts-variable: #005cc5;
+    --ts-property: #6f42c1;
+    --ts-tag: #116329;
+    --ts-name: #22863a;
+    --ts-comment: #6a737d;
+    --ts-atom: #e36209;
+    --ts-heading: #24292e;
+    --ts-link: #22863a;
+    --ts-deleted: #b31d28;
+    --ts-deleted-bg: #ffeef0;
+    --ts-invalid: #cb2431;
+}
+```
+
+Unset variables fall back to the built-in light/dark defaults, so you only need to declare the ones you want to change. To wire it to shadcn/Tailwind tokens:
+
+```css
+tab-search {
+    --ts-background: hsl(var(--background));
+    --ts-foreground: hsl(var(--foreground));
+    --ts-keyword: hsl(var(--primary));
+    --ts-comment: hsl(var(--muted-foreground));
+    /* ...etc */
+}
+```
+
+(Tailwind v4 with full color values: drop the `hsl()` wrapper.)
+
+For changes that don't fit a variable - different syntax-tag mappings, fonts, etc. - build your own theme with `LightInit` / `DarkInit` from `tab-search/codemirror` and skip `StarterKit`'s built-in switcher.
+
 ### Svelte, Hono, Drizzle ORM
 
 ```svelte

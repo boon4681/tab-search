@@ -1,6 +1,6 @@
 {
   "name": "tab-search",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -121,9 +121,11 @@
     },
     "./codemirror/css": {
       "import": {
+        "types": "./dist/codemirror/css/styles.d.ts",
         "default": "./dist/codemirror/css/styles.css"
       },
       "require": {
+        "types": "./dist/codemirror/css/styles.d.cts",
         "default": "./dist/codemirror/css/styles.css"
       }
     }
