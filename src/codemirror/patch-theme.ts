@@ -45,6 +45,16 @@ export interface Settings {
     fontFamily?: string;
     /** set editor font size */
     fontSize?: StyleSpec['fontSize'];
+    /** Autocomplete tooltip background. */
+    tooltipBackground?: string;
+    /** Autocomplete tooltip text color. */
+    tooltipForeground?: string;
+    /** Autocomplete tooltip border color. */
+    tooltipBorder?: string;
+    /** Autocomplete tooltip selected-item background. */
+    tooltipSelectedBackground?: string;
+    /** Autocomplete tooltip selected-item text color. */
+    tooltipSelectedForeground?: string;
 }
 
 export const createTheme = ({ theme, settings = {}, styles = [] }: CreateThemeOptions): Extension => {
@@ -115,6 +125,31 @@ export const createTheme = ({ theme, settings = {}, styles = [] }: CreateThemeOp
             backgroundColor: settings.selectionMatch,
         };
     }
+
+    const tooltipStyle: StyleSpec = {};
+    if (settings.tooltipBackground) {
+        tooltipStyle.background = settings.tooltipBackground;
+    }
+    if (settings.tooltipForeground) {
+        tooltipStyle.color = settings.tooltipForeground;
+    }
+    if (settings.tooltipBorder) {
+        tooltipStyle.borderColor = settings.tooltipBorder;
+    }
+    if (Object.keys(tooltipStyle).length) {
+        themeOptions['.cm-tooltip-autocomplete'] = tooltipStyle;
+    }
+    const tooltipSelectedStyle: StyleSpec = {};
+    if (settings.tooltipSelectedBackground) {
+        tooltipSelectedStyle.background = settings.tooltipSelectedBackground;
+    }
+    if (settings.tooltipSelectedForeground) {
+        tooltipSelectedStyle.color = settings.tooltipSelectedForeground;
+    }
+    if (Object.keys(tooltipSelectedStyle).length) {
+        themeOptions['.cm-tooltip-autocomplete ul li[aria-selected]'] = tooltipSelectedStyle;
+    }
+
     const themeExtension = EditorView.theme(themeOptions, {
         dark: theme === 'dark',
     });

@@ -122,6 +122,13 @@ tab-search {
     --ts-deleted: #b31d28;
     --ts-deleted-bg: #ffeef0;
     --ts-invalid: #cb2431;
+
+    /* Autocomplete tooltip */
+    --ts-tooltip-background: #fff;
+    --ts-tooltip-foreground: inherit;
+    --ts-tooltip-border: rgb(106, 106, 106);
+    --ts-tooltip-selected-background: rgb(59 130 246);
+    --ts-tooltip-selected-foreground: inherit;
 }
 ```
 

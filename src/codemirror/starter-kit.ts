@@ -55,7 +55,8 @@ export default function StarterKit(options: {
             zIndex: "9999",
             padding: "0",
             fontSize: "1em",
-            border: "1px solid rgb(106, 106, 106)",
+            borderWidth: "1px",
+            borderStyle: "solid",
             borderRadius: "0.5em",
         },
         ".cm-tooltip-autocomplete ul": {
@@ -75,9 +76,6 @@ export default function StarterKit(options: {
         },
         ".cm-tooltip-autocomplete .cm-completionDetail": {
             marginLeft: "auto",
-        },
-        ".cm-tooltip-autocomplete ul li[aria-selected]": {
-            background: "rgb(59 130 246)",
         },
         ".cm-cursorLayer .cm-cursor": {
             marginLeft: "0 !important",

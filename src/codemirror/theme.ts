@@ -9,6 +9,11 @@ export const defaultSettingsLight: CreateThemeOptions['settings'] = {
 	selectionMatch: 'var(--ts-selection-match, #BBDFFF)',
 	gutterBackground: 'var(--ts-gutter-background, #fff)',
 	gutterForeground: 'var(--ts-gutter-foreground, #6e7781)',
+	tooltipBackground: 'var(--ts-tooltip-background, #fff)',
+	tooltipForeground: 'var(--ts-tooltip-foreground, inherit)',
+	tooltipBorder: 'var(--ts-tooltip-border, rgb(106, 106, 106))',
+	tooltipSelectedBackground: 'var(--ts-tooltip-selected-background, rgb(59 130 246))',
+	tooltipSelectedForeground: 'var(--ts-tooltip-selected-foreground, inherit)',
 };
 
 export const LightStyle: CreateThemeOptions['styles'] = [
@@ -50,6 +55,11 @@ export const defaultSettingsDark: CreateThemeOptions['settings'] = {
 	selection: 'var(--ts-selection, #003d73)',
 	selectionMatch: 'var(--ts-selection-match, #003d73)',
 	lineHighlight: 'var(--ts-line-highlight, #36334280)',
+	tooltipBackground: 'var(--ts-tooltip-background, #161b22)',
+	tooltipForeground: 'var(--ts-tooltip-foreground, inherit)',
+	tooltipBorder: 'var(--ts-tooltip-border, rgb(106, 106, 106))',
+	tooltipSelectedBackground: 'var(--ts-tooltip-selected-background, rgb(59 130 246))',
+	tooltipSelectedForeground: 'var(--ts-tooltip-selected-foreground, inherit)',
 };
 
 export const DarkStyle: CreateThemeOptions['styles'] = [
